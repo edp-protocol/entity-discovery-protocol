@@ -1,0 +1,27 @@
+{
+  "schema_version": "0.1.0",
+  "domain": "lepetitzinc.fr",
+  "mcps": [
+    {
+      "provider": "booking-provider",
+      "endpoint": "https://mcp.booking-provider.com",
+      "entity_id": "lpz-paris-75006",
+      "capabilities": ["reservations", "availability", "menu"],
+      "priority": 10
+    },
+    {
+      "provider": "delivery-provider",
+      "endpoint": "https://mcp.delivery-provider.com",
+      "entity_id": "del-lpz-75006",
+      "capabilities": ["ordering", "delivery_tracking"],
+      "priority": 5
+    },
+    {
+      "provider": "payment-provider",
+      "endpoint": "https://mcp.payment-provider.com",
+      "entity_id": "pay-lpz-001",
+      "capabilities": ["payments"],
+      "priority": 10
+    }
+  ]
+}

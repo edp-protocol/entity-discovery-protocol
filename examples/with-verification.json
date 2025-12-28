@@ -1,0 +1,18 @@
+{
+  "schema_version": "0.1.0",
+  "domain": "lepetitzinc.fr",
+  "mcps": [
+    {
+      "provider": "booking-provider",
+      "endpoint": "https://mcp.booking-provider.com",
+      "entity_id": "lpz-paris-75006",
+      "capabilities": ["reservations", "availability", "menu"],
+      "verification": {
+        "method": "signed_jwt",
+        "signature": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImJvb2tpbmctcHJvdmlkZXIta2V5LTIwMjUifQ.eyJpc3MiOiJib29raW5nLXByb3ZpZGVyIiwic3ViIjoibGVwZXRpdHppbmMuZnIiLCJlbnRpdHlfaWQiOiJscHotcGFyaXMtNzUwMDYiLCJjYXBhYmlsaXRpZXMiOlsicmVzZXJ2YXRpb25zIiwiYXZhaWxhYmlsaXR5IiwibWVudSJdLCJpYXQiOjE3MzUzNDQwMDAsImV4cCI6MTc2Njg4MDAwMH0.signature_placeholder",
+        "issued_at": "2025-12-28T00:00:00Z",
+        "expires_at": "2026-12-28T00:00:00Z"
+      }
+    }
+  ]
+}

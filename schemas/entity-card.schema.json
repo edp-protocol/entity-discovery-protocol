@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://edp.example.com/schemas/entity-card.schema.json",
+  "title": "Entity Card",
+  "description": "Entity Discovery Protocol - Minimal Entity Card format declaring MCP associations",
+  "type": "object",
+  "required": ["schema_version", "domain", "mcps"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Version of the Entity Card schema",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "examples": ["0.1.0"]
+    },
+    "domain": {
+      "type": "string",
+      "description": "The domain publishing this Entity Card",
+      "format": "hostname",
+      "examples": ["mybusiness.com", "lepetitzinc.fr"]
+    },
+    "mcps": {
+      "type": "array",
+      "description": "List of MCPs this entity delegates to",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["provider", "endpoint"],
+        "properties": {
+          "provider": {
+            "type": "string",
+            "description": "Identifier of the MCP provider",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "^[a-z0-9-_]+$",
+            "examples": ["booking-provider", "payment-provider"]
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "MCP server endpoint URL (must be HTTPS)",
+            "format": "uri",
+            "pattern": "^https://",
+            "examples": ["https://mcp.booking-provider.com"]
+          },
+          "entity_id": {
+            "type": "string",
+            "description": "Entity's identifier at this MCP provider",
+            "maxLength": 200,
+            "examples": ["lpz-paris-75006", "acct_1234567890"]
+          },
+          "capabilities": {
+            "type": "array",
+            "description": "List of capabilities available via this MCP",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true,
+            "examples": [["reservations", "menu", "availability"]]
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Priority for capability conflicts (higher = preferred)",
+            "minimum": 0,
+            "maximum": 100,
+            "default": 0
+          },
+          "verification": {
+            "type": "object",
+            "description": "Verification information for Level 2 trust",
+            "properties": {
+              "method": {
+                "type": "string",
+                "description": "Verification method used",
+                "enum": ["signed_jwt"]
+              },
+              "signature": {
+                "type": "string",
+                "description": "Signed JWT from the MCP provider"
+              },
+              "issued_at": {
+                "type": "string",
+                "description": "When the signature was issued",
+                "format": "date-time"
+              },
+              "expires_at": {
+                "type": "string",
+                "description": "When the signature expires",
+                "format": "date-time"
+              }
+            },
+            "required": ["method", "signature"]
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema_version": "0.1.0",
+      "domain": "mybusiness.com",
+      "mcps": [
+        {
+          "provider": "booking-provider",
+          "endpoint": "https://mcp.booking-provider.com",
+          "entity_id": "mybusiness-123"
+        }
+      ]
+    }
+  ]
+}

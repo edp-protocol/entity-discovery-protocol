@@ -1,0 +1,11 @@
+{
+  "schema_version": "0.1.0",
+  "domain": "mybusiness.com",
+  "mcps": [
+    {
+      "provider": "booking-provider",
+      "endpoint": "https://mcp.booking-provider.com",
+      "entity_id": "mybusiness-123"
+    }
+  ]
+}

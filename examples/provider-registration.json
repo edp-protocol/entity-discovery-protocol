@@ -1,0 +1,46 @@
+{
+  "provider": {
+    "id": "booking-provider",
+    "name": "Booking Provider",
+    "endpoint": "https://mcp.booking-provider.com",
+    "public_key": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE...\n-----END PUBLIC KEY-----",
+    "capabilities": ["reservations", "availability", "menu", "cancellation"]
+  },
+  "entities": [
+    {
+      "entity_id": "lpz-paris-75006",
+      "name": "Le Petit Zinc",
+      "domain": "lepetitzinc.fr",
+      "category": "restaurant",
+      "location": {
+        "city": "Paris",
+        "country": "FR",
+        "coordinates": { "lat": 48.8534, "lng": 2.3328 }
+      },
+      "capabilities": ["reservations", "availability", "menu"]
+    },
+    {
+      "entity_id": "cafe-flore-75006",
+      "name": "Café de Flore",
+      "domain": "cafedeflore.fr",
+      "category": "restaurant",
+      "location": {
+        "city": "Paris",
+        "country": "FR",
+        "coordinates": { "lat": 48.8541, "lng": 2.3326 }
+      },
+      "capabilities": ["reservations", "availability"]
+    },
+    {
+      "entity_id": "brasserie-lipp-75006",
+      "name": "Brasserie Lipp",
+      "category": "restaurant",
+      "location": {
+        "city": "Paris",
+        "country": "FR",
+        "coordinates": { "lat": 48.8543, "lng": 2.3332 }
+      },
+      "capabilities": ["reservations", "menu"]
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://edp.example.com/schemas/provider-registration.schema.json",
+  "title": "Provider Registration",
+  "description": "Entity Discovery Protocol - MCP Provider registration format for bulk entity indexing",
+  "type": "object",
+  "required": ["provider", "entities"],
+  "properties": {
+    "provider": {
+      "type": "object",
+      "description": "Information about the MCP provider",
+      "required": ["id", "name", "endpoint"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the provider",
+          "pattern": "^[a-z0-9-_]+$",
+          "minLength": 2,
+          "maxLength": 50
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name of the provider",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "endpoint": {
+          "type": "string",
+          "description": "Base MCP server endpoint URL",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "public_key": {
+          "type": "string",
+          "description": "PEM-encoded public key for signature verification"
+        },
+        "capabilities": {
+          "type": "array",
+          "description": "Capabilities offered by this provider",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "entities": {
+      "type": "array",
+      "description": "List of entities served by this provider",
+      "items": {
+        "type": "object",
+        "required": ["entity_id", "name"],
+        "properties": {
+          "entity_id": {
+            "type": "string",
+            "description": "Entity's identifier at this provider",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable name of the entity",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "domain": {
+            "type": "string",
+            "description": "Entity's domain (if known)",
+            "format": "hostname"
+          },
+          "category": {
+            "type": "string",
+            "description": "Category of the entity"
+          },
+          "location": {
+            "type": "object",
+            "properties": {
+              "city": { "type": "string" },
+              "country": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$",
+                "description": "ISO 3166-1 alpha-2 country code"
+              },
+              "coordinates": {
+                "type": "object",
+                "required": ["lat", "lng"],
+                "properties": {
+                  "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+                  "lng": { "type": "number", "minimum": -180, "maximum": 180 }
+                }
+              }
+            }
+          },
+          "capabilities": {
+            "type": "array",
+            "description": "Capabilities available for this specific entity",
+            "items": { "type": "string" },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "signature": {
+      "type": "string",
+      "description": "Signature of the registration payload"
+    }
+  }
+}
