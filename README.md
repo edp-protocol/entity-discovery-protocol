@@ -3,7 +3,7 @@
 > **A standard for AI agents to discover which MCPs serve a given entity.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Spec Version](https://img.shields.io/badge/spec-v0.1.0-blue.svg)](SPEC.md)
+[![Spec Version](https://img.shields.io/badge/spec-v0.2.0-blue.svg)](SPEC.md)
 
 ## The Problem
 
@@ -13,13 +13,13 @@ The Model Context Protocol (MCP) enables AI agents to interact with services. Bu
 - **Server Cards (SEP-1649) answer**: "What can this MCP server do?"
 - **Entity Discovery Protocol answers**: "Which MCPs serve this business?"
 
-A restaurant doesn't run its own MCP server—it *delegates to* third-party MCP providers (booking, delivery, payments) to become actionable by AI agents. When an agent wants to help a user book a table at "Le Petit Zinc", it needs to discover that this restaurant delegates reservations to a booking provider.
+A restaurant doesn't run its own MCP server—it *delegates to* third-party MCP providers (booking, delivery, payments) to become actionable by AI agents. When an agent wants to help a user book a table at "Acme Bistro", it needs to discover that this restaurant delegates reservations to a booking provider.
 
 ```
-User: "Book a table at Le Petit Zinc for tonight"
-Agent: → Which MCP handles Le Petit Zinc?
-       → Query EDP Registry: resolve("Le Petit Zinc", "Paris")
-       → Response: Use mcp.booking-provider.com with entity_id "lpz-paris-75006"
+User: "Book a table at Acme Bistro Paris for tonight"
+Agent: → Which MCP handles Acme Bistro?
+       → Query EDP Registry: resolve("acme-bistro.com")
+       → Response: Use mcp.booking-provider.com with entity_id "acme-paris-001"
        → Agent calls Booking Provider MCP → Booking complete
 ```
 
@@ -30,25 +30,44 @@ Agent: → Which MCP handles Le Petit Zinc?
 Entities publish an `entity-card.json` declaring which MCPs they delegate to:
 
 ```
-https://lepetitzinc.fr/.well-known/entity-card.json
+https://acme-bistro.com/.well-known/entity-card.json
 ```
 
 ```json
 {
-  "schema_version": "0.1.0",
-  "domain": "lepetitzinc.fr",
-  "mcps": [
+  "schema_version": "0.2.0",
+  "domain": "acme-bistro.com",
+  "entities": [
     {
-      "provider": "booking-provider",
-      "endpoint": "https://mcp.booking-provider.com",
-      "entity_id": "lpz-paris-75006",
-      "capabilities": ["reservations", "menu", "availability"]
+      "name": "Acme Bistro Paris",
+      "path": "/paris",
+      "location": { "city": "Paris", "country": "FR" },
+      "mcps": [
+        {
+          "provider": "booking-provider",
+          "endpoint": "https://mcp.booking-provider.com",
+          "entity_id": "acme-paris-001",
+          "capabilities": ["reservations", "menu", "availability"]
+        }
+      ]
+    },
+    {
+      "name": "Acme Bistro Lyon",
+      "path": "/lyon",
+      "location": { "city": "Lyon", "country": "FR" },
+      "mcps": [
+        {
+          "provider": "booking-provider",
+          "endpoint": "https://mcp.booking-provider.com",
+          "entity_id": "acme-lyon-001"
+        }
+      ]
     }
   ]
 }
 ```
 
-Entity Cards are intentionally minimal—they only declare MCP associations. Business metadata (name, address, hours) lives on the website itself (via Schema.org, etc.) and is enriched by registries.
+Entity Cards support multiple entities per domain (e.g., restaurant chains with multiple locations). Each entity declares its own MCP associations. Business metadata is intentionally minimal—registries enrich entries from external sources.
 
 ### 2. EDP Registries
 
@@ -82,9 +101,9 @@ The specification covers:
 
 ## Examples
 
-- [minimal.json](examples/minimal.json) — Simplest possible Entity Card
+- [minimal.json](examples/minimal.json) — Simplest possible Entity Card (single entity)
+- [multi-mcp.json](examples/multi-mcp.json) — Multi-location entity with multiple MCP providers
 - [with-verification.json](examples/with-verification.json) — Entity Card with Level 2 verification
-- [multi-mcp.json](examples/multi-mcp.json) — Entity with multiple MCP providers
 - [provider-registration.json](examples/provider-registration.json) — Bulk provider registration
 
 ## Relationship to MCP
