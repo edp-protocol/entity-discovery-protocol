@@ -2,93 +2,149 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://edp.example.com/schemas/entity-card.schema.json",
   "title": "Entity Card",
-  "description": "Entity Discovery Protocol - Minimal Entity Card format declaring MCP associations",
+  "description": "Entity Discovery Protocol v0.2.0 - Entity Card with multi-entity support",
   "type": "object",
-  "required": ["schema_version", "domain", "mcps"],
+  "required": ["schema_version", "domain", "entities"],
   "properties": {
     "schema_version": {
       "type": "string",
       "description": "Version of the Entity Card schema",
       "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "examples": ["0.1.0"]
+      "examples": ["0.2.0"]
     },
     "domain": {
       "type": "string",
       "description": "The domain publishing this Entity Card",
       "format": "hostname",
-      "examples": ["mybusiness.com", "lepetitzinc.fr"]
+      "examples": ["example-restaurant.com", "acme-bistro.com"]
     },
-    "mcps": {
+    "entities": {
       "type": "array",
-      "description": "List of MCPs this entity delegates to",
+      "description": "List of entities at this domain",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["provider", "endpoint"],
+        "required": ["name", "mcps"],
         "properties": {
-          "provider": {
+          "name": {
             "type": "string",
-            "description": "Identifier of the MCP provider",
+            "description": "Human-readable name of the entity",
             "minLength": 1,
-            "maxLength": 100,
-            "pattern": "^[a-z0-9-_]+$",
-            "examples": ["booking-provider", "payment-provider"]
-          },
-          "endpoint": {
-            "type": "string",
-            "description": "MCP server endpoint URL (must be HTTPS)",
-            "format": "uri",
-            "pattern": "^https://",
-            "examples": ["https://mcp.booking-provider.com"]
-          },
-          "entity_id": {
-            "type": "string",
-            "description": "Entity's identifier at this MCP provider",
             "maxLength": 200,
-            "examples": ["lpz-paris-75006", "acct_1234567890"]
+            "examples": ["Acme Bistro Paris", "Acme Bistro Lyon"]
           },
-          "capabilities": {
-            "type": "array",
-            "description": "List of capabilities available via this MCP",
-            "items": {
-              "type": "string",
-              "minLength": 1
-            },
-            "uniqueItems": true,
-            "examples": [["reservations", "menu", "availability"]]
+          "path": {
+            "type": "string",
+            "description": "Path within domain identifying this entity (for multi-location domains)",
+            "pattern": "^/[a-zA-Z0-9/_-]*$",
+            "examples": ["/paris", "/lyon", "/downtown"]
           },
-          "priority": {
-            "type": "integer",
-            "description": "Priority for capability conflicts (higher = preferred)",
-            "minimum": 0,
-            "maximum": 100,
-            "default": 0
-          },
-          "verification": {
+          "location": {
             "type": "object",
-            "description": "Verification information for Level 2 trust",
+            "description": "Geographic location of this entity",
             "properties": {
-              "method": {
+              "city": {
                 "type": "string",
-                "description": "Verification method used",
-                "enum": ["signed_jwt"]
+                "description": "City where entity is located"
               },
-              "signature": {
+              "country": {
                 "type": "string",
-                "description": "Signed JWT from the MCP provider"
+                "description": "ISO 3166-1 alpha-2 country code",
+                "pattern": "^[A-Z]{2}$"
               },
-              "issued_at": {
-                "type": "string",
-                "description": "When the signature was issued",
-                "format": "date-time"
-              },
-              "expires_at": {
-                "type": "string",
-                "description": "When the signature expires",
-                "format": "date-time"
+              "coordinates": {
+                "type": "object",
+                "description": "GPS coordinates",
+                "properties": {
+                  "lat": {
+                    "type": "number",
+                    "minimum": -90,
+                    "maximum": 90
+                  },
+                  "lng": {
+                    "type": "number",
+                    "minimum": -180,
+                    "maximum": 180
+                  }
+                },
+                "required": ["lat", "lng"]
               }
-            },
-            "required": ["method", "signature"]
+            }
+          },
+          "mcps": {
+            "type": "array",
+            "description": "List of MCPs serving this entity",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["provider", "endpoint"],
+              "properties": {
+                "provider": {
+                  "type": "string",
+                  "description": "Identifier of the MCP provider",
+                  "minLength": 1,
+                  "maxLength": 100,
+                  "pattern": "^[a-z0-9-_]+$",
+                  "examples": ["booking-provider", "payment-provider"]
+                },
+                "endpoint": {
+                  "type": "string",
+                  "description": "MCP server endpoint URL (must be HTTPS)",
+                  "format": "uri",
+                  "pattern": "^https://",
+                  "examples": ["https://mcp.booking-provider.com"]
+                },
+                "entity_id": {
+                  "type": "string",
+                  "description": "Entity's identifier at this MCP provider",
+                  "maxLength": 200,
+                  "examples": ["acme-paris-001", "acme-lyon-002"]
+                },
+                "capabilities": {
+                  "type": "array",
+                  "description": "List of capabilities available via this MCP",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "uniqueItems": true,
+                  "examples": [["reservations", "menu", "availability"]]
+                },
+                "priority": {
+                  "type": "integer",
+                  "description": "Priority for capability conflicts (higher = preferred)",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "default": 0
+                },
+                "verification": {
+                  "type": "object",
+                  "description": "Verification information for Level 2 trust",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "description": "Verification method used",
+                      "enum": ["signed_jwt"]
+                    },
+                    "signature": {
+                      "type": "string",
+                      "description": "Signed JWT from the MCP provider"
+                    },
+                    "issued_at": {
+                      "type": "string",
+                      "description": "When the signature was issued",
+                      "format": "date-time"
+                    },
+                    "expires_at": {
+                      "type": "string",
+                      "description": "When the signature expires",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["method", "signature"]
+                }
+              }
+            }
           }
         }
       }
@@ -96,13 +152,18 @@
   },
   "examples": [
     {
-      "schema_version": "0.1.0",
-      "domain": "mybusiness.com",
-      "mcps": [
+      "schema_version": "0.2.0",
+      "domain": "example-restaurant.com",
+      "entities": [
         {
-          "provider": "booking-provider",
-          "endpoint": "https://mcp.booking-provider.com",
-          "entity_id": "mybusiness-123"
+          "name": "Example Restaurant",
+          "mcps": [
+            {
+              "provider": "booking-provider",
+              "endpoint": "https://mcp.booking-provider.com",
+              "entity_id": "example-001"
+            }
+          ]
         }
       ]
     }

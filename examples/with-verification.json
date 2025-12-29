@@ -1,18 +1,28 @@
 {
-  "schema_version": "0.1.0",
-  "domain": "lepetitzinc.fr",
-  "mcps": [
+  "schema_version": "0.2.0",
+  "domain": "example-restaurant.com",
+  "entities": [
     {
-      "provider": "booking-provider",
-      "endpoint": "https://mcp.booking-provider.com",
-      "entity_id": "lpz-paris-75006",
-      "capabilities": ["reservations", "availability", "menu"],
-      "verification": {
-        "method": "signed_jwt",
-        "signature": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImJvb2tpbmctcHJvdmlkZXIta2V5LTIwMjUifQ.eyJpc3MiOiJib29raW5nLXByb3ZpZGVyIiwic3ViIjoibGVwZXRpdHppbmMuZnIiLCJlbnRpdHlfaWQiOiJscHotcGFyaXMtNzUwMDYiLCJjYXBhYmlsaXRpZXMiOlsicmVzZXJ2YXRpb25zIiwiYXZhaWxhYmlsaXR5IiwibWVudSJdLCJpYXQiOjE3MzUzNDQwMDAsImV4cCI6MTc2Njg4MDAwMH0.signature_placeholder",
-        "issued_at": "2025-12-28T00:00:00Z",
-        "expires_at": "2026-12-28T00:00:00Z"
-      }
+      "name": "Example Restaurant Downtown",
+      "path": "/downtown",
+      "location": {
+        "city": "Paris",
+        "country": "FR"
+      },
+      "mcps": [
+        {
+          "provider": "booking-provider",
+          "endpoint": "https://mcp.booking-provider.com",
+          "entity_id": "example-downtown-001",
+          "capabilities": ["reservations", "availability", "menu"],
+          "verification": {
+            "method": "signed_jwt",
+            "signature": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImJvb2tpbmctcHJvdmlkZXIta2V5LTIwMjUifQ.eyJpc3MiOiJib29raW5nLXByb3ZpZGVyIiwic3ViIjoiZXhhbXBsZS1yZXN0YXVyYW50LmNvbSIsImVudGl0eV9pZCI6ImV4YW1wbGUtZG93bnRvd24tMDAxIiwiY2FwYWJpbGl0aWVzIjpbInJlc2VydmF0aW9ucyIsImF2YWlsYWJpbGl0eSIsIm1lbnUiXSwiaWF0IjoxNzM1MzQ0MDAwLCJleHAiOjE3NjY4ODAwMDB9.signature_placeholder",
+            "issued_at": "2025-12-29T00:00:00Z",
+            "expires_at": "2026-12-29T00:00:00Z"
+          }
+        }
+      ]
     }
   ]
 }

@@ -1,27 +1,55 @@
 {
-  "schema_version": "0.1.0",
-  "domain": "lepetitzinc.fr",
-  "mcps": [
+  "schema_version": "0.2.0",
+  "domain": "acme-bistro.com",
+  "entities": [
     {
-      "provider": "booking-provider",
-      "endpoint": "https://mcp.booking-provider.com",
-      "entity_id": "lpz-paris-75006",
-      "capabilities": ["reservations", "availability", "menu"],
-      "priority": 10
+      "name": "Acme Bistro Paris",
+      "path": "/paris",
+      "location": {
+        "city": "Paris",
+        "country": "FR",
+        "coordinates": {
+          "lat": 48.8566,
+          "lng": 2.3522
+        }
+      },
+      "mcps": [
+        {
+          "provider": "booking-provider",
+          "endpoint": "https://mcp.booking-provider.com",
+          "entity_id": "acme-paris-001",
+          "capabilities": ["reservations", "availability", "menu"],
+          "priority": 10
+        },
+        {
+          "provider": "delivery-provider",
+          "endpoint": "https://mcp.delivery-provider.com",
+          "entity_id": "acme-del-paris-001",
+          "capabilities": ["ordering", "delivery_tracking"],
+          "priority": 5
+        }
+      ]
     },
     {
-      "provider": "delivery-provider",
-      "endpoint": "https://mcp.delivery-provider.com",
-      "entity_id": "del-lpz-75006",
-      "capabilities": ["ordering", "delivery_tracking"],
-      "priority": 5
-    },
-    {
-      "provider": "payment-provider",
-      "endpoint": "https://mcp.payment-provider.com",
-      "entity_id": "pay-lpz-001",
-      "capabilities": ["payments"],
-      "priority": 10
+      "name": "Acme Bistro Lyon",
+      "path": "/lyon",
+      "location": {
+        "city": "Lyon",
+        "country": "FR",
+        "coordinates": {
+          "lat": 45.7640,
+          "lng": 4.8357
+        }
+      },
+      "mcps": [
+        {
+          "provider": "booking-provider",
+          "endpoint": "https://mcp.booking-provider.com",
+          "entity_id": "acme-lyon-001",
+          "capabilities": ["reservations", "availability", "menu"],
+          "priority": 10
+        }
+      ]
     }
   ]
 }

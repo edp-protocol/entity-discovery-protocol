@@ -1,9 +1,9 @@
 # Entity Discovery Protocol Specification
 
-**Version**: 0.1.0 (Draft)  
-**Status**: Draft  
-**Authors**: Yoann Arzu  
-**Last Updated**: 2025-12-28
+**Version**: 0.2.0 (Draft)
+**Status**: Draft
+**Authors**: Yoann Arzu
+**Last Updated**: 2025-12-29
 
 ## Abstract
 
@@ -49,48 +49,89 @@ This follows [RFC 8615](https://tools.ietf.org/html/rfc8615) for well-known URIs
 
 ```json
 {
-  "schema_version": "0.1.0",
+  "schema_version": "0.2.0",
   "domain": "string (required)",
-  "mcps": [
+  "entities": [
     {
-      "provider": "string (required)",
-      "endpoint": "string (required, URL)",
-      "entity_id": "string (optional)",
-      "capabilities": ["string (optional)"],
-      "priority": "number (optional, default: 0)",
-      "verification": {
-        "method": "string (optional)",
-        "signature": "string (optional)",
-        "issued_at": "string (optional, ISO 8601)",
-        "expires_at": "string (optional, ISO 8601)"
-      }
+      "name": "string (required)",
+      "path": "string (optional)",
+      "location": {
+        "city": "string (optional)",
+        "country": "string (optional, ISO 3166-1 alpha-2)",
+        "coordinates": {
+          "lat": "number (optional)",
+          "lng": "number (optional)"
+        }
+      },
+      "mcps": [
+        {
+          "provider": "string (required)",
+          "endpoint": "string (required, URL)",
+          "entity_id": "string (optional)",
+          "capabilities": ["string (optional)"],
+          "priority": "number (optional, default: 0)",
+          "verification": {
+            "method": "string (optional)",
+            "signature": "string (optional)",
+            "issued_at": "string (optional, ISO 8601)",
+            "expires_at": "string (optional, ISO 8601)"
+          }
+        }
+      ]
     }
   ]
 }
 ```
 
-### 2.4 Domain Validation
+### 2.4 Multi-Entity Support
+
+A single domain can serve multiple entities (e.g., a restaurant chain with multiple locations). Each entity is identified by its `path` within the domain.
+
+For example, `acme-bistro.com` may have:
+- `/paris` - Acme Bistro Paris
+- `/lyon` - Acme Bistro Lyon
+
+Each entity can have different MCP providers or entity_ids at the same provider.
+
+### 2.5 Domain Validation
 
 The `domain` field MUST match the domain hosting the Entity Card.
 
 For example, if the Entity Card is hosted at:
 ```
-https://lepetitzinc.fr/.well-known/entity-card.json
+https://example-restaurant.com/.well-known/entity-card.json
 ```
 
-Then the `domain` field MUST be `lepetitzinc.fr`.
+Then the `domain` field MUST be `example-restaurant.com`.
 
 Registries SHOULD reject Entity Cards where the domain does not match the hosting domain. This prevents impersonation attacks where a malicious site claims to be another business.
 
-### 2.5 Field Definitions
+### 2.6 Field Definitions
 
 #### Root Fields
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `schema_version` | string | Yes | Version of the Entity Card schema (e.g., "0.1.0") |
+| `schema_version` | string | Yes | Version of the Entity Card schema (e.g., "0.2.0") |
 | `domain` | string | Yes | The domain publishing this Entity Card |
-| `mcps` | array | Yes | List of MCP associations |
+| `entities` | array | Yes | List of entities at this domain |
+
+#### Entity Object
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Human-readable name of the entity |
+| `path` | string | No | Path within domain identifying this entity (e.g., "/paris") |
+| `location` | object | No | Geographic location information |
+| `mcps` | array | Yes | List of MCP associations for this entity |
+
+#### Location Object
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `city` | string | No | City where entity is located |
+| `country` | string | No | ISO 3166-1 alpha-2 country code |
+| `coordinates` | object | No | GPS coordinates (lat/lng) |
 
 #### MCP Entry Object
 
@@ -103,7 +144,7 @@ Registries SHOULD reject Entity Cards where the domain does not match the hostin
 | `priority` | number | No | Priority for capability conflicts (higher = preferred) |
 | `verification` | object | No | Verification information |
 
-### 2.6 Capabilities
+### 2.7 Capabilities
 
 Capabilities describe what actions are possible via an MCP. Recommended values:
 
@@ -220,8 +261,8 @@ Both sources agree:
 **Use case**: Production, bookings, sensitive actions.
 
 **How registries verify**:
-1. Provider registers entity with `domain: "lepetitzinc.fr"`
-2. Registry fetches `https://lepetitzinc.fr/.well-known/entity-card.json`
+1. Provider registers entity with `domain: "example-restaurant.com"`
+2. Registry fetches `https://example-restaurant.com/.well-known/entity-card.json`
 3. Entity Card lists the same provider → Level 2 confirmed
 
 ### 4.5 Optional: Cryptographic Signature
@@ -257,19 +298,24 @@ This is **optional** for Level 2 but recommended for:
 
 ```json
 {
-  "schema_version": "0.1.0",
-  "domain": "lepetitzinc.fr",
-  "mcps": [
+  "schema_version": "0.2.0",
+  "domain": "example-restaurant.com",
+  "entities": [
     {
-      "provider": "booking-provider",
-      "endpoint": "https://mcp.booking-provider.com",
-      "entity_id": "lpz-paris-75006",
-      "verification": {
-        "method": "signed_jwt",
-        "signature": "eyJhbGciOiJFUzI1NiIs...",
-        "issued_at": "2025-12-28T00:00:00Z",
-        "expires_at": "2026-12-28T00:00:00Z"
-      }
+      "name": "Example Restaurant",
+      "mcps": [
+        {
+          "provider": "booking-provider",
+          "endpoint": "https://mcp.booking-provider.com",
+          "entity_id": "example-001",
+          "verification": {
+            "method": "signed_jwt",
+            "signature": "eyJhbGciOiJFUzI1NiIs...",
+            "issued_at": "2025-12-29T00:00:00Z",
+            "expires_at": "2026-12-29T00:00:00Z"
+          }
+        }
+      ]
     }
   ]
 }
@@ -307,28 +353,32 @@ GET /v1/resolve?query={search_query}&location={location}
 {
   "results": [
     {
-      "entity": {
-        "name": "Le Petit Zinc",
-        "domain": "lepetitzinc.fr",
-        "category": "restaurant",
-        "location": {
-          "address": "12 rue de Rennes, 75006 Paris",
-          "coordinates": { "lat": 48.8534, "lng": 2.3328 }
-        },
-        "verification_level": 2
-      },
-      "mcps": [
+      "domain": "example-restaurant.com",
+      "entities": [
         {
-          "provider": "booking-provider",
-          "endpoint": "https://mcp.booking-provider.com",
-          "entity_id": "lpz-paris-75006",
-          "capabilities": ["reservations", "menu"],
-          "verification": {
-            "level": 2,
-            "method": "signed_jwt",
-            "valid": true,
-            "expires_at": "2026-12-28T00:00:00Z"
-          }
+          "name": "Example Restaurant Paris",
+          "path": "/paris",
+          "category": "restaurant",
+          "location": {
+            "city": "Paris",
+            "country": "FR",
+            "coordinates": { "lat": 48.8534, "lng": 2.3328 }
+          },
+          "verification_level": 2,
+          "mcps": [
+            {
+              "provider": "booking-provider",
+              "endpoint": "https://mcp.booking-provider.com",
+              "entity_id": "example-paris-001",
+              "capabilities": ["reservations", "menu"],
+              "verification": {
+                "level": 2,
+                "method": "signed_jwt",
+                "valid": true,
+                "expires_at": "2026-12-29T00:00:00Z"
+              }
+            }
+          ]
         }
       ],
       "confidence": 0.95
@@ -337,15 +387,39 @@ GET /v1/resolve?query={search_query}&location={location}
 }
 ```
 
-Note: The `entity` object in the response contains enriched metadata from the registry, not from the Entity Card itself.
+Note: Entity metadata (name, category, location) in the response is enriched by the registry, not taken directly from the Entity Card.
 
 ### 5.2 Resolve by Domain
 
 ```http
 GET /v1/resolve/domain/{domain}
+GET /v1/resolve/domain/{domain}?path={path}
 ```
 
-Returns the entity and MCPs for a specific domain.
+Returns all entities for a domain. Use the optional `path` parameter to filter to a specific entity.
+
+**Response**:
+```json
+{
+  "domain": "acme-bistro.com",
+  "entities": [
+    {
+      "name": "Acme Bistro Paris",
+      "path": "/paris",
+      "location": { "city": "Paris", "country": "FR" },
+      "verification_level": 2,
+      "mcps": [...]
+    },
+    {
+      "name": "Acme Bistro Lyon",
+      "path": "/lyon",
+      "location": { "city": "Lyon", "country": "FR" },
+      "verification_level": 1,
+      "mcps": [...]
+    }
+  ]
+}
+```
 
 ### 5.3 Find Nearby
 
@@ -430,42 +504,74 @@ Entity Cards are public by design (they're published on websites).
 
 ## Appendix A: Examples
 
-### A.1 Minimal Entity Card
+### A.1 Minimal Entity Card (Single Entity)
 
 ```json
 {
-  "schema_version": "0.1.0",
-  "domain": "mybusiness.com",
-  "mcps": [
+  "schema_version": "0.2.0",
+  "domain": "example-restaurant.com",
+  "entities": [
     {
-      "provider": "booking-provider",
-      "endpoint": "https://mcp.booking-provider.com",
-      "entity_id": "mybusiness-123"
+      "name": "Example Restaurant",
+      "mcps": [
+        {
+          "provider": "booking-provider",
+          "endpoint": "https://mcp.booking-provider.com",
+          "entity_id": "example-001"
+        }
+      ]
     }
   ]
 }
 ```
 
-### A.2 Entity Card with Multiple MCPs
+### A.2 Multi-Location Entity Card
 
 ```json
 {
-  "schema_version": "0.1.0",
-  "domain": "lepetitzinc.fr",
-  "mcps": [
+  "schema_version": "0.2.0",
+  "domain": "acme-bistro.com",
+  "entities": [
     {
-      "provider": "booking-provider",
-      "endpoint": "https://mcp.booking-provider.com",
-      "entity_id": "lpz-paris-75006",
-      "capabilities": ["reservations", "availability", "menu"],
-      "priority": 10
+      "name": "Acme Bistro Paris",
+      "path": "/paris",
+      "location": {
+        "city": "Paris",
+        "country": "FR",
+        "coordinates": { "lat": 48.8566, "lng": 2.3522 }
+      },
+      "mcps": [
+        {
+          "provider": "booking-provider",
+          "endpoint": "https://mcp.booking-provider.com",
+          "entity_id": "acme-paris-001",
+          "capabilities": ["reservations", "availability", "menu"],
+          "priority": 10
+        },
+        {
+          "provider": "delivery-provider",
+          "endpoint": "https://mcp.delivery-provider.com",
+          "entity_id": "acme-del-paris-001",
+          "capabilities": ["ordering", "delivery_tracking"],
+          "priority": 5
+        }
+      ]
     },
     {
-      "provider": "delivery-provider",
-      "endpoint": "https://mcp.delivery-provider.com",
-      "entity_id": "del-lpz-75006",
-      "capabilities": ["ordering", "delivery_tracking"],
-      "priority": 5
+      "name": "Acme Bistro Lyon",
+      "path": "/lyon",
+      "location": {
+        "city": "Lyon",
+        "country": "FR"
+      },
+      "mcps": [
+        {
+          "provider": "booking-provider",
+          "endpoint": "https://mcp.booking-provider.com",
+          "entity_id": "acme-lyon-001",
+          "capabilities": ["reservations", "availability", "menu"]
+        }
+      ]
     }
   ]
 }
@@ -475,26 +581,39 @@ Entity Cards are public by design (they're published on websites).
 
 ```json
 {
-  "schema_version": "0.1.0",
-  "domain": "lepetitzinc.fr",
-  "mcps": [
+  "schema_version": "0.2.0",
+  "domain": "example-restaurant.com",
+  "entities": [
     {
-      "provider": "booking-provider",
-      "endpoint": "https://mcp.booking-provider.com",
-      "entity_id": "lpz-paris-75006",
-      "capabilities": ["reservations", "menu"],
-      "verification": {
-        "method": "signed_jwt",
-        "signature": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9...",
-        "issued_at": "2025-12-28T00:00:00Z",
-        "expires_at": "2026-12-28T00:00:00Z"
-      }
+      "name": "Example Restaurant Downtown",
+      "path": "/downtown",
+      "mcps": [
+        {
+          "provider": "booking-provider",
+          "endpoint": "https://mcp.booking-provider.com",
+          "entity_id": "example-downtown-001",
+          "capabilities": ["reservations", "menu"],
+          "verification": {
+            "method": "signed_jwt",
+            "signature": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "issued_at": "2025-12-29T00:00:00Z",
+            "expires_at": "2026-12-29T00:00:00Z"
+          }
+        }
+      ]
     }
   ]
 }
 ```
 
 ## Appendix B: Changelog
+
+### v0.2.0 (2025-12-29)
+- **Breaking change**: Add multi-entity support via `entities[]` array
+- Move MCPs from root level to per-entity
+- Add `name`, `path`, and `location` fields to entities
+- Update Resolution API to return `entities[]` array
+- One domain can now serve multiple locations/entities
 
 ### v0.1.0 (2025-12-28)
 - Initial draft specification

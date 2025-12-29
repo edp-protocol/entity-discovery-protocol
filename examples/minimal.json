@@ -1,11 +1,16 @@
 {
-  "schema_version": "0.1.0",
-  "domain": "mybusiness.com",
-  "mcps": [
+  "schema_version": "0.2.0",
+  "domain": "example-restaurant.com",
+  "entities": [
     {
-      "provider": "booking-provider",
-      "endpoint": "https://mcp.booking-provider.com",
-      "entity_id": "mybusiness-123"
+      "name": "Example Restaurant",
+      "mcps": [
+        {
+          "provider": "booking-provider",
+          "endpoint": "https://mcp.booking-provider.com",
+          "entity_id": "example-001"
+        }
+      ]
     }
   ]
 }
